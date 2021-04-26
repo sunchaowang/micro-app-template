@@ -1,30 +1,28 @@
 import "./public-path";
-import Vue from 'vue'
+import { createApp } from 'vue';
+import { createRouter, createWebHashHistory } from 'vue-router';
+
+import routes from './router';
+import store from './store';
 import App from './App.vue'
-import VueRouter from 'vue-router';
 
-import routes from './router'
-import store from './store'
-
-
-Vue.config.productionTip = false
 
 let router = null;
 let instance = null;
+let history = null;
 
 function render(props = {}) {
   const { container } = props;
-  router = new VueRouter({
-    base: window.__POWERED_BY_QIANKUN__ ? '/systemApp/' : '/',
-    mode: 'history',
-    routes
+  const _store = props.store;
+  router = createRouter({
+    history: createWebHashHistory(),
+    routes,
   });
 
-  instance = new Vue({
-    router,
-    store,
-    render: (h) => h(App),
-  }).$mount(container ? container.querySelector('#app') : '#app');
+  instance = createApp(App);
+  instance.use(router);
+  instance.use(Object.assign(_store, store));
+  instance.mount("#app");
 }
 // 独立运行时
 if (!window.__POWERED_BY_QIANKUN__) {
@@ -32,15 +30,34 @@ if (!window.__POWERED_BY_QIANKUN__) {
 }
 
 export async function bootstrap() {
-  console.log('[vue] vue app bootstraped');
+  console.log('%c ', 'color: green;', 'vue3.0 app bootstraped');
 }
+
+function storeTest(props) {
+  props.onGlobalStateChange &&
+  props.onGlobalStateChange(
+      (value, prev) => console.log(`[onGlobalStateChange - ${props.name}]:`, value, prev),
+      true,
+  );
+  props.setGlobalState &&
+  props.setGlobalState({
+    ignore: props.name,
+    user: {
+      name: props.name,
+    },
+  });
+}
+
 export async function mount(props) {
-  console.log('[vue] props from main framework', props);
+  storeTest(props);
   render(props);
+  instance.config.globalProperties.$onGlobalStateChange = props.onGlobalStateChange;
+  instance.config.globalProperties.$setGlobalState = props.setGlobalState;
 }
+
 export async function unmount() {
-  instance.$destroy();
-  instance.$el.innerHTML = '';
+  instance.unmount();
+  instance._container.innerHTML = '';
   instance = null;
   router = null;
 }

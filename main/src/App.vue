@@ -1,48 +1,52 @@
 <template>
-	<div id="app">
-		<HelloWorld msg="mainApp"/>
-		<ul class="sub-apps">
-			<li v-for="item in microApps" :class="{active: item.activeRule === current}" :key="item.name" @click="goto(item)">{{ item.name }}</li>
-		</ul>
-		<div id="micro-app-container"></div>
-	</div>
+    <el-menu class="el-menu-demo" mode="horizontal" :router="true">
+        <el-menu-item index="/Login">
+            Login
+        </el-menu-item>
+        <el-menu-item v-for="item in microApps" :key="item.name" :index="`/${item.name}`">
+            {{item.name}}
+        </el-menu-item>
+    </el-menu>
+	<div>
+        <router-view />
+        <div id="micro-app-container"></div>
+    </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-import microApps from './mirco-app'
-
+import microApps from './mirco-app';
+import {useRouter} from "vue-router";
+import {ref} from "vue";
 export default {
 	name: 'App',
-	components: {
-		HelloWorld
-	},
-	data() {
-		return {
-			microApps,
-			current: '/main/'
-		}
-	},
-	methods: {
-		goto (item) {
-			history.pushState(null, item.activeRule, item.activeRule)
-			// this.current = item.name
-		},
-	},
+    setup() {
+        const router = useRouter();
+        const current = ref("");
+
+        function goto(app) {
+            router.push({
+                path: `/${app.name}`
+            })
+        }
+        return {
+            current,
+            goto
+        }
+    },
+    data() {
+        return {
+            microApps,
+        }
+    },
 }
 </script>
 
-<style>
+<style scoped>
 #app {
 	font-family: Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
 	color: #2c3e50;
-	margin-top: 60px;
-}
-.active{
-	color: #42b983;
-	text-decoration: underline;
 }
 </style>

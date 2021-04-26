@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <HelloWorld msg="microapp-system"/>
+      <router-view />
   </div>
 </template>
 
