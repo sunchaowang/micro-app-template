@@ -39,7 +39,7 @@ const apps = microApps.map(item => {
     return {
         ...item,
         props: {
-            store
+            store: store
         }
     }
 })
@@ -52,31 +52,29 @@ registerMicroApps([
     },
     beforeMount: [
         app => {
-            console.log('[LifeCycle] before mount %c%s', 'color: green;', app.name)
+            // console.log('[LifeCycle] before mount %c%s', 'color: green;', app.name)
         }
     ],
     afterMount: [
         app => {
-            console.log('[LifeCycle] after mount %c%s', 'color: green;', app.name)
+            // console.log('[LifeCycle] after mount %c%s', 'color: green;', app.name)
         }
     ],
     afterUnmount: [
         app => {
-            console.log('[LifeCycle] after unmount %c%s', 'color: green;', app.name)
+            // console.log('[LifeCycle] after unmount %c%s', 'color: green;', app.name)
         }
     ]
 })
-const { onGlobalStateChange, setGlobalState } = initGlobalState({
-    user: 'qiankun',
-});
 
-onGlobalStateChange((value, prev) => console.log('[onGlobalStateChange - master]:', value, prev));
-setGlobalState({
-    ignore: 'master',
-    user: {
-        name: 'master',
-    },
+// 初始化 state
+const { onGlobalStateChange, setGlobalState } = initGlobalState(store.state);
+
+onGlobalStateChange((value, prev) => {
+    console.log('[Main] [onGlobalStateChange], new:', value, ", old:", prev)
 });
+instance.config.globalProperties.setGlobalState = setGlobalState;
+instance.config.globalProperties.onGlobalStateChange = onGlobalStateChange;
 /**
  * Step3 设置默认进入的子应用
  */

@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import {getCurrentInstance} from 'vue';
 import {useStore} from "vuex";
 
 export default {
@@ -14,10 +15,19 @@ export default {
         const store = useStore();
 
         const storeCount = store.state;
-        console.log(storeCount)
+
+        const instance = getCurrentInstance();
+
+        instance.appContext.config.globalProperties.onGlobalStateChange((newValue, oldValue) => {
+            console.log("newValue ... oldValue ... ", newValue, oldValue)
+        })
 
         function loginClick() {
-            store.dispatch("count/increment");
+            // 修改主应用的state
+            // store.dispatch("count/increment");
+            instance.appContext.config.globalProperties.setGlobalState({
+                count: Math.random()
+            })
         }
         return {
             storeCount,

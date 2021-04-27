@@ -37,8 +37,12 @@ function storeTest(props) {
 export async function mount(props) {
 	storeTest(props);
 	render(props);
-	instance.config.globalProperties.$onGlobalStateChange = props.onGlobalStateChange;
-	instance.config.globalProperties.$setGlobalState = props.setGlobalState;
+	props.onGlobalStateChange(
+		(value, prev) => console.log(`[onGlobalStateChange - ${props.name}]:`, value, prev),
+		true,
+	);
+	instance.config.globalProperties.onGlobalStateChange = props.onGlobalStateChange;
+	instance.config.globalProperties.setGlobalState = props.setGlobalState;
 }
 
 export async function unmount() {
